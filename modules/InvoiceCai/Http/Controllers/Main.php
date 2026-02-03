@@ -6,7 +6,7 @@ use App\Abstracts\Http\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class SettingsController extends Controller
+class Main extends Controller
 {
     public function edit()
     {

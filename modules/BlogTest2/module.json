@@ -1,0 +1,17 @@
+{
+    "alias": "blog-test2",
+    "icon": "fa fa-cog",
+    "version": "1.0.0",
+    "active": 1,
+    "providers": [
+        "Modules\\BlogTest2\\Providers\\Event",
+        "Modules\\BlogTest2\\Providers\\Main"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": [],
+    "reports": [],
+    "widgets": [],
+    "settings": [],
+    "extra-modules": {}
+}

@@ -11,11 +11,12 @@ class InvoiceCaiServiceProvider extends Provider
         $this->loadTranslations();
         $this->loadViews();
         $this->loadMigrations();
+        $this->loadRoutes();
     }
 
     public function register(): void
     {
-        $this->loadRoutes();
+        //
     }
 
     protected function loadViews(): void
