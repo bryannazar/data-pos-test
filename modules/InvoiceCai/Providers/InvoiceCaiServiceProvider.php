@@ -14,6 +14,12 @@ class InvoiceCaiServiceProvider extends Provider
         $this->loadRoutes();
         $this->registerDocumentObserver();
         $this->loadViewComposers();
+        
+        // Apply translation overrides after the application is booted
+        // This ensures core translations are loaded first
+        $this->app->booted(function () {
+            $this->overrideCoreTranslations();
+        });
     }
 
     public function register(): void
@@ -29,6 +35,85 @@ class InvoiceCaiServiceProvider extends Provider
     protected function loadTranslations(): void
     {
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'invoice-cai');
+    }
+
+    protected function overrideCoreTranslations(): void
+    {
+        $translator = app('translator');
+        
+        // Define translation overrides as flat keys
+        $overrides = [
+            'en-GB' => [
+                'general.tax_number' => 'RTN',
+                'customers.form_description.billing' => 'The RTN appears in every invoice issued to the customer. The selected currency becomes the default currency for this customer.',
+                'vendors.form_description.billing' => 'The RTN appears in every bill issued to you. The selected currency becomes the default currency for this vendor.',
+                'companies.form_description.billing' => 'The RTN appears in every invoice/bill. Dashboard and Reports are shown under the default currency.',
+                'settings.company.description' => 'Change company name, email, address, RTN etc',
+                'settings.company.search_keywords' => 'company, name, email, phone, address, country, RTN, tax number, logo, city, town, state, province, zip code',
+            ],
+            'es-ES' => [
+                'general.tax_number' => 'RTN',
+                'customers.form_description.billing' => 'El RTN aparece en cada factura que se emite al cliente. La moneda seleccionada se convierte en la moneda predeterminada para este cliente.',
+                'vendors.form_description.billing' => 'El RTN aparece en cada factura que se le emite. La moneda seleccionada se convierte en la moneda predeterminada para este proveedor.',
+                'companies.form_description.billing' => 'El RTN aparece en cada factura. El panel de informes y los reportes se muestran bajo la moneda predeterminada.',
+                'settings.company.description' => 'Cambiar el nombre de la empresa, correo electrónico, dirección, RTN, etc',
+                'settings.company.search_keywords' => 'empresa, nombre, correo electrónico, teléfono, dirección, país, RTN, identificación fiscal, logotipo, ciudad, pueblo, estado, provincia, código postal',
+            ],
+        ];
+
+        // Apply overrides by directly modifying the loaded translations
+        foreach ($overrides as $locale => $translations) {
+            foreach ($translations as $key => $value) {
+                $this->setNestedTranslation($translator, $locale, $key, $value);
+            }
+        }
+    }
+
+    protected function setNestedTranslation($translator, string $locale, string $key, string $value): void
+    {
+        // Parse the key to extract group and item
+        // Format: "group.item" or "group.nested.item"
+        $parts = explode('.', $key, 2);
+        $group = $parts[0];
+        $item = $parts[1] ?? null;
+
+        if (!$item) {
+            return;
+        }
+
+        // Access the loaded translations using reflection
+        $reflection = new \ReflectionClass($translator);
+        $loadedProperty = $reflection->getProperty('loaded');
+        $loadedProperty->setAccessible(true);
+        
+        $loaded = $loadedProperty->getValue($translator);
+        
+        // Ensure the group is loaded first by calling get() which triggers loading
+        // This is a hack to make sure the translations are loaded before we modify them
+        $translator->get("{$group}.{$item}", [], $locale);
+        
+        // Refresh loaded after the get() call
+        $loaded = $loadedProperty->getValue($translator);
+        
+        // Navigate to the nested location and set the value
+        $itemParts = explode('.', $item);
+        $current = &$loaded['*'][$group][$locale];
+        
+        foreach ($itemParts as $index => $part) {
+            if ($index === count($itemParts) - 1) {
+                // Last part, set the value
+                $current[$part] = $value;
+            } else {
+                // Navigate deeper
+                if (!isset($current[$part]) || !is_array($current[$part])) {
+                    $current[$part] = [];
+                }
+                $current = &$current[$part];
+            }
+        }
+        
+        // Save the modified loaded array back
+        $loadedProperty->setValue($translator, $loaded);
     }
 
     protected function loadMigrations(): void
