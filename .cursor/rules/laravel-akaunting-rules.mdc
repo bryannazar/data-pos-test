@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+
+1. Akaunting Core Protection
+- Never modify files inside vendor/akaunting/* or Akaunting core modules.
+- All customizations must be done using:
+- Custom modules
+- Events & listeners
+- Service providers
+- Published views (when necessary)
+
+2. Configuration Over Hardcoding
+- No magic values (IDs, flags, percentages, strings) inside code.
+- All configurable behavior must live in config/*.php.
+- Access configuration via config() only.
+
+3. Naming & Readability
+- Class, method, and variable names must be explicit and intention-revealing.
+- Avoid abbreviations and ambiguous names.
+- Optimize for clarity over brevity.
+
+4. Avoid Premature Optimization
+- Write clear, maintainable code first.
+- Optimize only when there is a proven performance issue.
+- Do not introduce caching, queues, or complexity without a clear reason.
