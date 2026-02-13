@@ -1,0 +1,24 @@
+# Archivos de entorno
+.env
+.env.local
+.env.*.backup
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Dependencias
+/vendor
+/node_modules
+
+# Logs y cache
+/storage/*.key
+/storage/*.log
+/storage/framework/*
+storage/logs/*
+storage/cache/*
+bootstrap/cache/*
+
+# Otros archivos sensibles
+.idea
+.vscode
