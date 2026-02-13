@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::admin('invoice-cai', function () {
-    Route::get('fiscal', 'SettingsController@edit')->name('edit');
-    Route::patch('fiscal', 'SettingsController@update')->name('update');
+    Route::get('fiscal', 'Main@edit')->name('edit');
+    Route::patch('fiscal', 'Main@update')->name('update');
 }, [
     'prefix' => 'settings/invoices',
     'as'     => 'settings.invoices.fiscal.',
